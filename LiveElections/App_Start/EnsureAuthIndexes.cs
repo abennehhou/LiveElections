@@ -8,7 +8,6 @@ namespace LiveElections
         {
             var context = ApplicationIdentityContext.Create();
             IndexChecks.EnsureUniqueIndexOnUserName(context.Users);
-            IndexChecks.EnsureUniqueIndexOnRoleName(context.Roles);
         }
     }
 }

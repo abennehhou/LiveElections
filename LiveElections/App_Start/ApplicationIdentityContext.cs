@@ -1,38 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AspNet.Identity.MongoDB;
 using LiveElections.Models;
 using MongoDB.Driver;
+using System.Configuration;
 
 namespace LiveElections
 {
     public class ApplicationIdentityContext : IDisposable
     {
+        private const string AppSettingsKeyConnectionString = "MongoDBConnectionString";
+        private const string AppSettingsKeyDatabase         = "MongoDBLiveElectionsDatabase";
+        private const string AppSettingsKeyCollectionUsers  = "MongoDBCollectionUsers";
+
         public static ApplicationIdentityContext Create()
         {
-            // todo add settings where appropriate to switch server & database in your own application
-            var client = new MongoClient("mongodb://localhost:27017");
-            var database = client.GetDatabase("mydb");
-            var users = database.GetCollection<ApplicationUser>("users");
-            var roles = database.GetCollection<IdentityRole>("roles");
-            return new ApplicationIdentityContext(users, roles);
+            var connectionString    = ConfigurationManager.AppSettings[AppSettingsKeyConnectionString];
+            var databaseName        = ConfigurationManager.AppSettings[AppSettingsKeyDatabase];
+            var usersCollectionName = ConfigurationManager.AppSettings[AppSettingsKeyCollectionUsers];
+
+            var client   = new MongoClient(connectionString);
+            var database = client.GetDatabase(databaseName);
+            var users    = database.GetCollection<ApplicationUser>(usersCollectionName);
+
+            return new ApplicationIdentityContext(users);
         }
 
-        private ApplicationIdentityContext(IMongoCollection<ApplicationUser> users, IMongoCollection<IdentityRole> roles)
+        private ApplicationIdentityContext(IMongoCollection<ApplicationUser> users)
         {
             Users = users;
-            Roles = roles;
         }
-
-        public IMongoCollection<IdentityRole> Roles { get; set; }
 
         public IMongoCollection<ApplicationUser> Users { get; set; }
-
-        public Task<List<IdentityRole>> AllRolesAsync()
-        {
-            return Roles.Find(r => true).ToListAsync();
-        }
 
         public void Dispose()
         {
