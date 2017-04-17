@@ -14,8 +14,10 @@ namespace LiveElections
         private const string AppSettingsKeyConnectionString     = "MongoDBConnectionString";
         private const string AppSettingsKeyDatabase             = "MongoDBLiveElectionsDatabase";
         private const string AppSettingsKeyCollectionCandidates = "MongoDBCollectionCandidates";
+        private const string AppSettingsKeyCollectionVotes      = "MongoDBCollectionVotes";
 
         private readonly string CandidatesCollectionName;
+        private readonly string VotesCollectionName;
 
         public ElectionsContext()
         {
@@ -23,15 +25,17 @@ namespace LiveElections
             var connectionString = ConfigurationManager.AppSettings[AppSettingsKeyConnectionString];
             var settings = MongoClientSettings.FromUrl(new MongoUrl(connectionString));
             var client = new MongoClient(settings);
-            _logger.Debug(string.Format("Mongo Client initialized with connection string {0}.", connectionString));
+            _logger.Debug($"Mongo Client initialized with connection string {connectionString}.");
 
             var databaseName = ConfigurationManager.AppSettings[AppSettingsKeyDatabase];
             ElectionsDatabase = client.GetDatabase(databaseName);
             CandidatesCollectionName = ConfigurationManager.AppSettings[AppSettingsKeyCollectionCandidates];
+            VotesCollectionName = ConfigurationManager.AppSettings[AppSettingsKeyCollectionVotes];
 
-            _logger.Debug(string.Format("Connection to database '{0}' initialized.", databaseName));
+            _logger.Debug($"Connection to database '{databaseName}' initialized.");
         }
 
         public IMongoCollection<Candidate> Candidates => ElectionsDatabase.GetCollection<Candidate>(CandidatesCollectionName);
+        public IMongoCollection<Vote> Votes => ElectionsDatabase.GetCollection<Vote>(VotesCollectionName);
     }
 }

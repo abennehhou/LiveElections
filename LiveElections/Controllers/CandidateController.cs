@@ -9,15 +9,22 @@ namespace LiveElections.Controllers
     public class CandidateController : Controller
     {
         private CandidateService _candidateService;
+        private VoteService _voteService;
 
         public CandidateController()
         {
             _candidateService = new CandidateService();
+            _voteService = new VoteService();
         }
 
         public async Task<ActionResult> Index()
         {
             var candidates = await _candidateService.GetAllCandidates();
+            foreach (var candidate in candidates)
+            {
+                candidate.NumberOfVotes = await _voteService.CountVotes(candidate.Id);
+            }
+
             return View(candidates);
         }
 

@@ -1,0 +1,27 @@
+﻿@using LiveElections.Models
+
+@model VoteSummaryModel
+
+@{
+    ViewBag.Title = "Vote!";
+}
+
+<h2>Vote</h2>
+
+@if (Model.HasVoted)
+{
+    <p>Your vote is taken into account.</p>
+}
+else
+{
+    using (Html.BeginForm("Vote", "Vote"))
+    {
+        foreach (var candidate in Model.Candidates)
+        {
+            <div class="radio">
+                @Html.RadioButton("candidate", candidate.Id) @candidate.FirstName @candidate.LastName
+            </div>
+        }
+        <input type="submit" value="Submit" class="btn btn-default" />
+    }
+}

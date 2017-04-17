@@ -99,5 +99,12 @@ namespace LiveElections.Services
 
             return candidates;
         }
+
+        public async Task<int> CountCandidates()
+        {
+            return await MvcApplication.ElectionsContext.Candidates
+                .AsQueryable()
+                .CountAsync();
+        }
     }
 }
